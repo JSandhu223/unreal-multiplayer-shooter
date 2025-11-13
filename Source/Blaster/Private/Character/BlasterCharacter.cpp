@@ -3,12 +3,13 @@
 
 #include "Character/BlasterCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "GameFramework/PlayerController.h"
 
 
 ABlasterCharacter::ABlasterCharacter()
@@ -24,6 +25,11 @@ ABlasterCharacter::ABlasterCharacter()
 	this->FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	this->FollowCamera->SetupAttachment(this->CameraBoom, USpringArmComponent::SocketName);
 	this->FollowCamera->bUsePawnControlRotation = false;
+
+	// Prevents character from rotating along with the controller rotation
+	bUseControllerRotationYaw = false;
+	// Makes the character face toward the direction of movement
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
 void ABlasterCharacter::BeginPlay()
