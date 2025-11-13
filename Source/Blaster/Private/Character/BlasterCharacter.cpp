@@ -10,6 +10,7 @@
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Components/WidgetComponent.h"
 
 
 ABlasterCharacter::ABlasterCharacter()
@@ -30,6 +31,9 @@ ABlasterCharacter::ABlasterCharacter()
 	bUseControllerRotationYaw = false;
 	// Makes the character face toward the direction of movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	this->OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
+	this->OverheadWidget->SetupAttachment(this->RootComponent);
 }
 
 void ABlasterCharacter::BeginPlay()
