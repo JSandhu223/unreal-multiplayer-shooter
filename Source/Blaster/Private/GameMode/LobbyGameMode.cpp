@@ -13,6 +13,12 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 	int32 NumberOfPlayers = this->GameState.Get()->PlayerArray.Num();
 	if (NumberOfPlayers == 2)
 	{
-		
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			this->bUseSeamlessTravel = true;
+			// Travel to the BlasterMap, specifying it as a listen server for clients to connect to
+			World->ServerTravel(FString("/Game/Maps/BlasterMap?listen"));
+		}
 	}
 }
