@@ -40,7 +40,7 @@ void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// TODO: move enhanced input code to a player controller class
+	// TODO: Update this code to prevent crashes in multiplayer
 	check(KeyboardContext);
 	check(MouseContext);
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetController<APlayerController>()->GetLocalPlayer());
