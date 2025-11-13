@@ -35,6 +35,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class UCameraComponent* FollowCamera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* OverheadWidget;
+
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Mapping Contexts")
 	class UInputMappingContext* KeyboardContext;
 
