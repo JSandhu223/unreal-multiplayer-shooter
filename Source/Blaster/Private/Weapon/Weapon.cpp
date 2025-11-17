@@ -3,6 +3,8 @@
 
 #include "Weapon/Weapon.h"
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Character/BlasterCharacter.h"
 
 
 // Sets default values
@@ -28,18 +30,39 @@ AWeapon::AWeapon()
 	this->AreaSphere->SetupAttachment(this->RootComponent);
 	this->AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	this->AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	this->PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupWidget"));
+	this->PickupWidget->SetupAttachment(this->RootComponent);
 }
 
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (this->PickupWidget)
+	{
+		this->PickupWidget->SetVisibility(false);
+	}
+
 	if (HasAuthority())
 	{
 		this->AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		this->WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+
+		this->AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnSphereOverlap);
 	}
 	
+}
+
+void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AreaSphere overlapped with: %s"), *OtherActor->GetName());
+
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+	if (BlasterCharacter && this->PickupWidget)
+	{
+		this->PickupWidget->SetVisibility(true);
+	}
 }
 
 void AWeapon::Tick(float DeltaTime)
