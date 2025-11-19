@@ -11,6 +11,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "Weapon/Weapon.h"
 
 
 ABlasterCharacter::ABlasterCharacter()
@@ -36,6 +38,14 @@ ABlasterCharacter::ABlasterCharacter()
 	this->OverheadWidget->SetupAttachment(this->RootComponent);
 }
 
+void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Register OverlappingWeapon to be replicated
+	DOREPLIFETIME_CONDITION(ABlasterCharacter, OverlappingWeapon, COND_OwnerOnly);
+}
+
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -56,6 +66,10 @@ void ABlasterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (this->OverlappingWeapon)
+	{
+		this->OverlappingWeapon->ShowPickupWidget(true);
+	}
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -107,5 +121,35 @@ void ABlasterCharacter::DoMouseLook(const FInputActionValue& InputActionValue)
 	{
 		AddControllerYawInput(InputAxisVector.X);
 		AddControllerPitchInput(InputAxisVector.Y);
+	}
+}
+
+void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
+{
+	if (this->OverlappingWeapon)
+	{
+		this->OverlappingWeapon->ShowPickupWidget(false);
+	}
+
+	this->OverlappingWeapon = Weapon;
+	if (this->IsLocallyControlled())
+	{
+		if (this->OverlappingWeapon)
+		{
+			this->OverlappingWeapon->ShowPickupWidget(true);
+		}
+	}
+}
+
+void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+{
+	if (this->OverlappingWeapon)
+	{
+		this->OverlappingWeapon->ShowPickupWidget(true);
+	}
+
+	if (LastWeapon)
+	{
+		LastWeapon->ShowPickupWidget(false);
 	}
 }
