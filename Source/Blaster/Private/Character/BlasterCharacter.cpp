@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Components/WidgetComponent.h"
+#include "BlasterComponents/CombatComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
 
@@ -36,6 +37,9 @@ ABlasterCharacter::ABlasterCharacter()
 
 	this->OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	this->OverheadWidget->SetupAttachment(this->RootComponent);
+
+	this->Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	this->Combat->SetIsReplicated(true);
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
