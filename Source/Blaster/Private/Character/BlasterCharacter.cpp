@@ -6,10 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
-#include "InputMappingContext.h"
-#include "InputAction.h"
-#include "EnhancedInputSubsystems.h"
-#include "EnhancedInputComponent.h"
 #include "Components/WidgetComponent.h"
 #include "BlasterComponents/CombatComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -52,18 +48,7 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 void ABlasterCharacter::BeginPlay()
 {
-	Super::BeginPlay();
-
-	// TODO: Update this code to prevent crashes in multiplayer
-	check(KeyboardContext);
-	check(MouseContext);
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetController<APlayerController>()->GetLocalPlayer());
-	if (Subsystem)
-	{
-		Subsystem->AddMappingContext(KeyboardContext, 0);
-		Subsystem->AddMappingContext(MouseContext, 0);
-	}
-	
+	Super::BeginPlay();	
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -79,14 +64,6 @@ void ABlasterCharacter::Tick(float DeltaTime)
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	// TODO: Move enhanced input code to a player controller class
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ABlasterCharacter::DoJump);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABlasterCharacter::DoMove);
-	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ABlasterCharacter::DoMouseLook);
-	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterCharacter::DoEquip);
 }
 
 void ABlasterCharacter::PostInitializeComponents()
@@ -96,60 +73,6 @@ void ABlasterCharacter::PostInitializeComponents()
 	if (this->Combat)
 	{
 		this->Combat->Character = this;
-	}
-}
-
-void ABlasterCharacter::DoJump(const FInputActionValue& InputActionValue)
-{
-	float Value = InputActionValue.Get<float>();
-
-	//UE_LOG(LogTemp, Warning, TEXT("Jump value: %f"), Value);
-
-	// For now, we'll just call the existing Jump function from the Character class
-	Jump();
-}
-
-void ABlasterCharacter::DoMove(const FInputActionValue& InputActionValue)
-{
-	FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
-
-	//UE_LOG(LogTemp, Warning, TEXT("Jump value: %s"), *InputAxisVector.ToString());
-
-	if (GetController() != nullptr)
-	{
-		const FRotator YawRotation(0.0f, GetController()->GetControlRotation().Yaw, 0.0f);
-		const FVector ForwardDirection(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X));
-		const FVector RightDirection(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y));
-
-		AddMovementInput(ForwardDirection, InputAxisVector.Y);
-		AddMovementInput(RightDirection, InputAxisVector.X);
-	}
-}
-
-void ABlasterCharacter::DoMouseLook(const FInputActionValue& InputActionValue)
-{
-	FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
-
-	//UE_LOG(LogTemp, Warning, TEXT("Jump value: %s"), *InputAxisVector.ToString());
-
-	if (GetController() != nullptr)
-	{
-		AddControllerYawInput(InputAxisVector.X);
-		AddControllerPitchInput(InputAxisVector.Y);
-	}
-}
-
-void ABlasterCharacter::DoEquip(const FInputActionValue& InputActionValue)
-{
-	bool InputValue = InputActionValue.Get<bool>();
-
-	// Equip the weapon on the SERVER
-	if (this->Combat && this->HasAuthority())
-	{
-		this->Combat->EquipWeapon(this->OverlappingWeapon);
-
-		// DEBUG
-		UE_LOG(LogTemp, Warning, TEXT("Equipped weapon!"));
 	}
 }
 
@@ -168,6 +91,16 @@ void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 			this->OverlappingWeapon->ShowPickupWidget(true);
 		}
 	}
+}
+
+AWeapon* ABlasterCharacter::GetOverlappingWeapon()
+{
+	return this->OverlappingWeapon;
+}
+
+UCombatComponent* ABlasterCharacter::GetCombatComponent()
+{
+	return this->Combat;
 }
 
 void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)

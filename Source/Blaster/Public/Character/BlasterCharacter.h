@@ -48,31 +48,7 @@ private:
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
-private:
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Mapping Contexts")
-	class UInputMappingContext* KeyboardContext;
+	AWeapon* GetOverlappingWeapon();
 
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Mapping Contexts")
-	class UInputMappingContext* MouseContext;
-
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
-	class UInputAction* JumpAction;
-
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
-	class UInputAction* MoveAction;
-
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
-	class UInputAction* MouseLookAction;
-
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
-	class UInputAction* EquipAction;
-
-protected:
-	void DoJump(const struct FInputActionValue& InputActionValue);
-
-	void DoMove(const FInputActionValue& InputActionValue);
-
-	void DoMouseLook(const FInputActionValue& InputActionValue);
-
-	void DoEquip(const FInputActionValue& InputActionValue);
+	UCombatComponent* GetCombatComponent();
 };
