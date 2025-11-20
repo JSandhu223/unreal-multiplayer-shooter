@@ -88,3 +88,7 @@ void AWeapon::ShowPickupWidget(bool bShowWidget)
 	}
 }
 
+void AWeapon::SetWeaponState(EWeaponState State)
+{
+	this->WeaponState = State;
+}

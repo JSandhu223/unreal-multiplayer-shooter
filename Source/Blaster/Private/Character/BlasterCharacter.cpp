@@ -89,6 +89,16 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterCharacter::DoEquip);
 }
 
+void ABlasterCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (this->Combat)
+	{
+		this->Combat->Character = this;
+	}
+}
+
 void ABlasterCharacter::DoJump(const FInputActionValue& InputActionValue)
 {
 	float Value = InputActionValue.Get<float>();
@@ -133,7 +143,14 @@ void ABlasterCharacter::DoEquip(const FInputActionValue& InputActionValue)
 {
 	bool InputValue = InputActionValue.Get<bool>();
 
-	UE_LOG(LogTemp, Warning, TEXT("Equipped!"));
+	// Equip the weapon on the SERVER
+	if (this->Combat && this->HasAuthority())
+	{
+		this->Combat->EquipWeapon(this->OverlappingWeapon);
+
+		// DEBUG
+		UE_LOG(LogTemp, Warning, TEXT("Equipped weapon!"));
+	}
 }
 
 void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)

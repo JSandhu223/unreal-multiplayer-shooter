@@ -14,10 +14,17 @@ class BLASTER_API UCombatComponent : public UActorComponent
 
 public:	
 	UCombatComponent();
+	friend class ABlasterCharacter;
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void EquipWeapon(class AWeapon* WeaponToEquip);
 
 protected:
 	virtual void BeginPlay() override;
 
-public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+private:
+	class ABlasterCharacter* Character;
+
+	AWeapon* EquippedWeapon;
 };
