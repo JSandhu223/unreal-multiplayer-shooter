@@ -24,12 +24,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void DoJump(const struct FInputActionValue& InputActionValue);
-
-	void DoMove(const FInputActionValue& InputActionValue);
-
-	void DoMouseLook(const FInputActionValue& InputActionValue);
-
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class USpringArmComponent* CameraBoom;
@@ -67,4 +61,16 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
 	class UInputAction* MouseLookAction;
+
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
+	class UInputAction* EquipAction;
+
+protected:
+	void DoJump(const struct FInputActionValue& InputActionValue);
+
+	void DoMove(const FInputActionValue& InputActionValue);
+
+	void DoMouseLook(const FInputActionValue& InputActionValue);
+
+	void DoEquip(const FInputActionValue& InputActionValue);
 };

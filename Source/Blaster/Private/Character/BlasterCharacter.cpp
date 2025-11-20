@@ -86,6 +86,7 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ABlasterCharacter::DoJump);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABlasterCharacter::DoMove);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ABlasterCharacter::DoMouseLook);
+	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterCharacter::DoEquip);
 }
 
 void ABlasterCharacter::DoJump(const FInputActionValue& InputActionValue)
@@ -126,6 +127,13 @@ void ABlasterCharacter::DoMouseLook(const FInputActionValue& InputActionValue)
 		AddControllerYawInput(InputAxisVector.X);
 		AddControllerPitchInput(InputAxisVector.Y);
 	}
+}
+
+void ABlasterCharacter::DoEquip(const FInputActionValue& InputActionValue)
+{
+	bool InputValue = InputActionValue.Get<bool>();
+
+	UE_LOG(LogTemp, Warning, TEXT("Equipped!"));
 }
 
 void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
