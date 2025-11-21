@@ -39,7 +39,7 @@ void ABlasterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoJump);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMove);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMouseLook);
-	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::DoEquip);
+	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::EquipButtonPressed);
 }
 
 void ABlasterPlayerController::DoJump(const FInputActionValue& InputActionValue)
@@ -82,7 +82,7 @@ void ABlasterPlayerController::DoMouseLook(const FInputActionValue& InputActionV
 	AddPitchInput(InputAxisVector.Y);
 }
 
-void ABlasterPlayerController::DoEquip(const FInputActionValue& InputActionValue)
+void ABlasterPlayerController::EquipButtonPressed(const FInputActionValue& InputActionValue)
 {
 	bool InputValue = InputActionValue.Get<bool>();
 
@@ -90,11 +90,31 @@ void ABlasterPlayerController::DoEquip(const FInputActionValue& InputActionValue
 	if (!BlasterCharacter) { return; }
 
 	// Equip the weapon on the SERVER
-	if (BlasterCharacter->GetCombatComponent() && BlasterCharacter->HasAuthority())
+	if (BlasterCharacter->GetCombatComponent())
 	{
-		BlasterCharacter->GetCombatComponent()->EquipWeapon(BlasterCharacter->GetOverlappingWeapon());
+		if (BlasterCharacter->HasAuthority())
+		{
+			BlasterCharacter->GetCombatComponent()->EquipWeapon(BlasterCharacter->GetOverlappingWeapon());
+		}
+
+		// If a client is trying to equip the weapon, execute the RPC
+		else
+		{
+			this->ServerEquipButtonPressed();
+		}
 
 		// DEBUG
 		UE_LOG(LogTemp, Warning, TEXT("Equipped weapon!"));
+	}
+}
+
+void ABlasterPlayerController::ServerEquipButtonPressed_Implementation()
+{
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter());
+	if (!BlasterCharacter) { return; }
+
+	if (BlasterCharacter->GetCombatComponent())
+	{
+		BlasterCharacter->GetCombatComponent()->EquipWeapon(BlasterCharacter->GetOverlappingWeapon());
 	}
 }

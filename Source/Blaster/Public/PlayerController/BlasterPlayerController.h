@@ -23,6 +23,11 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
+	// Remote Procedure Call (RPC) will be called on the server and executed on the client
+	UFUNCTION(Server, Reliable)
+	void ServerEquipButtonPressed();
+
+private:
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Mapping Contexts")
 	class UInputMappingContext* KeyboardContext;
 
@@ -48,5 +53,5 @@ protected:
 
 	void DoMouseLook(const FInputActionValue& InputActionValue);
 
-	void DoEquip(const FInputActionValue& InputActionValue);
+	void EquipButtonPressed(const FInputActionValue& InputActionValue);
 };
