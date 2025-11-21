@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Character/BlasterCharacter.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -60,6 +61,13 @@ void AWeapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AWeapon::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AWeapon, WeaponState);
+}
+
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("AreaSphere overlapped with: %s"), *OtherActor->GetName());
@@ -91,4 +99,27 @@ void AWeapon::ShowPickupWidget(bool bShowWidget)
 void AWeapon::SetWeaponState(EWeaponState State)
 {
 	this->WeaponState = State;
+
+	switch (this->WeaponState)
+	{
+		case EWeaponState::EWS_Equipped:
+			this->ShowPickupWidget(false);
+			this->AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			break;
+	}
+}
+
+void AWeapon::OnRep_WeaponState()
+{
+	switch (this->WeaponState)
+	{
+		case EWeaponState::EWS_Equipped:
+			this->ShowPickupWidget(false);
+			break;
+	}
+}
+
+USphereComponent* AWeapon::GetAreaSphere() const
+{
+	return this->AreaSphere;
 }

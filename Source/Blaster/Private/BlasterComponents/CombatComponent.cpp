@@ -5,6 +5,7 @@
 #include "Weapon/Weapon.h"
 #include "Character/BlasterCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Components/SphereComponent.h"
 
 
 UCombatComponent::UCombatComponent()
@@ -14,7 +15,7 @@ UCombatComponent::UCombatComponent()
 
 void UCombatComponent::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -36,9 +37,9 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		HandSocket->AttachActor(this->EquippedWeapon, this->Character->GetMesh());
 	}
 
-	// Set the owner of the weapon to be the character
+	// Set the owner of the weapon to be the character. Note that this is replicated to all clients (see docs).
 	this->EquippedWeapon->SetOwner(this->Character);
 	// Hide the pickup widget
-	this->EquippedWeapon->ShowPickupWidget(false);
+	
 }
 
