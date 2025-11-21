@@ -23,7 +23,7 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
-	// Remote Procedure Call (RPC) will be called on the server and executed on the client
+	// Server RPC
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
 
