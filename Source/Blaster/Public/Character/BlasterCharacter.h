@@ -18,15 +18,13 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void PostInitializeComponents() override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	void DoJump(const struct FInputActionValue& InputActionValue);
-
-	void DoMove(const FInputActionValue& InputActionValue);
-
-	void DoMouseLook(const FInputActionValue& InputActionValue);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
@@ -38,18 +36,19 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* OverheadWidget;
 
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Mapping Contexts")
-	class UInputMappingContext* KeyboardContext;
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	class AWeapon* OverlappingWeapon;
 
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Mapping Contexts")
-	class UInputMappingContext* MouseContext;
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
-	class UInputAction* JumpAction;
+	UPROPERTY(VisibleAnywhere)
+	class UCombatComponent* Combat;
 
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
-	class UInputAction* MoveAction;
+public:
+	void SetOverlappingWeapon(AWeapon* Weapon);
 
-	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
-	class UInputAction* MouseLookAction;
+	AWeapon* GetOverlappingWeapon();
+
+	UCombatComponent* GetCombatComponent();
 };
