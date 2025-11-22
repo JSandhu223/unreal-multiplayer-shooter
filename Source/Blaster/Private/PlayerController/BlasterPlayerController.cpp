@@ -102,9 +102,6 @@ void ABlasterPlayerController::EquipButtonPressed(const FInputActionValue& Input
 		{
 			this->ServerEquipButtonPressed();
 		}
-
-		// DEBUG
-		UE_LOG(LogTemp, Warning, TEXT("Equipped weapon!"));
 	}
 }
 
