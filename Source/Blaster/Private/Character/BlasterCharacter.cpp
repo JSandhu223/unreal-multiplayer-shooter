@@ -36,6 +36,8 @@ ABlasterCharacter::ABlasterCharacter()
 
 	this->Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	this->Combat->SetIsReplicated(true);
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

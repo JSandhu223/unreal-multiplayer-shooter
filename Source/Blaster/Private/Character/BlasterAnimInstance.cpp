@@ -10,26 +10,28 @@ void UBlasterAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	this->BlasterCharacter = Cast<ABlasterCharacter>(TryGetPawnOwner());
+	BlasterCharacter = Cast<ABlasterCharacter>(TryGetPawnOwner());
 }
 
 void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
-	if (this->BlasterCharacter == nullptr)
+	if (BlasterCharacter == nullptr)
 	{
-		this->BlasterCharacter = Cast<ABlasterCharacter>(TryGetPawnOwner());
+		BlasterCharacter = Cast<ABlasterCharacter>(TryGetPawnOwner());
 		return;
 	}
 
-	FVector Velocity = this->BlasterCharacter->GetVelocity();
+	FVector Velocity = BlasterCharacter->GetVelocity();
 	Velocity.Z = 0.0f;
 	Speed = Velocity.Size();
 
-	bIsInAir = this->BlasterCharacter->GetCharacterMovement()->IsFalling();
+	bIsInAir = BlasterCharacter->GetCharacterMovement()->IsFalling();
 
-	bIsAccelerating = this->BlasterCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.0f ? true : false;
+	bIsAccelerating = BlasterCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.0f ? true : false;
 
-	bWeaponEquipped = this->BlasterCharacter->IsWeaponEquipped();
+	bWeaponEquipped = BlasterCharacter->IsWeaponEquipped();
+
+	bIsCrouched = BlasterCharacter->bIsCrouched;
 }

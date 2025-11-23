@@ -40,6 +40,7 @@ void ABlasterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMove);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMouseLook);
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::EquipButtonPressed);
+	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::CrouchButtonPressed);
 }
 
 void ABlasterPlayerController::DoJump(const FInputActionValue& InputActionValue)
@@ -113,5 +114,13 @@ void ABlasterPlayerController::ServerEquipButtonPressed_Implementation()
 	if (BlasterCharacter->GetCombatComponent())
 	{
 		BlasterCharacter->GetCombatComponent()->EquipWeapon(BlasterCharacter->GetOverlappingWeapon());
+	}
+}
+
+void ABlasterPlayerController::CrouchButtonPressed(const FInputActionValue& InputActionValue)
+{
+	if (ACharacter* ControlledCharacter = this->GetCharacter())
+	{
+		ControlledCharacter->bIsCrouched ? ControlledCharacter->UnCrouch() : ControlledCharacter->Crouch();
 	}
 }

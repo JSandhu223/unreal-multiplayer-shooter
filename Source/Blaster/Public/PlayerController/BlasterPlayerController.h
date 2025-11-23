@@ -46,6 +46,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
 	class UInputAction* EquipAction;
 
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
+	class UInputAction* CrouchAction;
+
 protected:
 	void DoJump(const struct FInputActionValue& InputActionValue);
 
@@ -54,4 +57,6 @@ protected:
 	void DoMouseLook(const FInputActionValue& InputActionValue);
 
 	void EquipButtonPressed(const FInputActionValue& InputActionValue);
+
+	void CrouchButtonPressed(const FInputActionValue& InputActionValue);
 };
