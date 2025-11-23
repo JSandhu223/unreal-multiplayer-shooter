@@ -48,6 +48,8 @@ private:
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
+	bool IsWeaponEquipped();
+
 	AWeapon* GetOverlappingWeapon();
 
 	UCombatComponent* GetCombatComponent();
