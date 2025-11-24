@@ -100,6 +100,11 @@ bool ABlasterCharacter::IsWeaponEquipped()
 	return (this->Combat && this->Combat->EquippedWeapon);
 }
 
+bool ABlasterCharacter::IsAiming()
+{
+	return (this->Combat && this->Combat->bAiming);
+}
+
 AWeapon* ABlasterCharacter::GetOverlappingWeapon()
 {
 	return this->OverlappingWeapon;

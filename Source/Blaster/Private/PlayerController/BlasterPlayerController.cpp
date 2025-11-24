@@ -41,6 +41,8 @@ void ABlasterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMouseLook);
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::EquipButtonPressed);
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::CrouchButtonPressed);
+	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ABlasterPlayerController::AimButtonPressed);
+	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::AimButtonReleased);
 }
 
 void ABlasterPlayerController::DoJump(const FInputActionValue& InputActionValue)
@@ -122,5 +124,27 @@ void ABlasterPlayerController::CrouchButtonPressed(const FInputActionValue& Inpu
 	if (ACharacter* ControlledCharacter = this->GetCharacter())
 	{
 		ControlledCharacter->bIsCrouched ? ControlledCharacter->UnCrouch() : ControlledCharacter->Crouch();
+	}
+}
+
+void ABlasterPlayerController::AimButtonPressed(const FInputActionValue& InputActionValue)
+{
+	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
+	{
+		if (BlasterCharacter->GetCombatComponent())
+		{
+			BlasterCharacter->GetCombatComponent()->bAiming = true;
+		}
+	}
+}
+
+void ABlasterPlayerController::AimButtonReleased(const FInputActionValue& InputActionValue)
+{
+	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
+	{
+		if (BlasterCharacter->GetCombatComponent())
+		{
+			BlasterCharacter->GetCombatComponent()->bAiming = false;
+		}
 	}
 }

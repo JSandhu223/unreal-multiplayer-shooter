@@ -50,6 +50,8 @@ public:
 
 	bool IsWeaponEquipped();
 
+	bool IsAiming();
+
 	AWeapon* GetOverlappingWeapon();
 
 	UCombatComponent* GetCombatComponent();

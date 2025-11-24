@@ -30,4 +30,10 @@ private:
 
 	UPROPERTY(Replicated)
 	AWeapon* EquippedWeapon;
+
+public:
+	UPROPERTY(Replicated)
+	bool bAiming = false;
+
+private:
 };
