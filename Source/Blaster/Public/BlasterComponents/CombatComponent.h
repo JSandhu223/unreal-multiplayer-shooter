@@ -35,5 +35,10 @@ public:
 	UPROPERTY(Replicated)
 	bool bAiming = false;
 
+	void SetAiming(bool bIsAiming);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetAiming(bool bIsAiming);
+
 private:
 };

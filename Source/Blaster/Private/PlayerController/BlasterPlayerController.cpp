@@ -133,7 +133,7 @@ void ABlasterPlayerController::AimButtonPressed(const FInputActionValue& InputAc
 	{
 		if (BlasterCharacter->GetCombatComponent())
 		{
-			BlasterCharacter->GetCombatComponent()->bAiming = true;
+			BlasterCharacter->GetCombatComponent()->SetAiming(true);
 		}
 	}
 }
@@ -144,7 +144,7 @@ void ABlasterPlayerController::AimButtonReleased(const FInputActionValue& InputA
 	{
 		if (BlasterCharacter->GetCombatComponent())
 		{
-			BlasterCharacter->GetCombatComponent()->bAiming = false;
+			BlasterCharacter->GetCombatComponent()->SetAiming(false);
 		}
 	}
 }
