@@ -38,8 +38,15 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	bAiming = BlasterCharacter->IsAiming();
 
+	// Offset Yaw for strafing
 	FRotator AimRotation = BlasterCharacter->GetBaseAimRotation();
 	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(BlasterCharacter->GetVelocity());
 	YawOffset = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw;
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).ToString());
+
+	CharacterRotationLastFrame = CharacterRotation;
+	CharacterRotation = BlasterCharacter->GetActorRotation();
+	const FRotator Delta = UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotation, CharacterRotationLastFrame);
+	const float Target = Delta.Yaw / DeltaTime;
+	const float Interp = FMath::FInterpTo(Lean, Target, DeltaTime, 6.0f);
+	Lean = FMath::Clamp(Interp, -90.0f, 90.0f);
 }
