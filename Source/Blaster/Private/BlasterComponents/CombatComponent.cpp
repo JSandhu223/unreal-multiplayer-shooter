@@ -7,6 +7,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 UCombatComponent::UCombatComponent()
@@ -17,6 +18,15 @@ UCombatComponent::UCombatComponent()
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void UCombatComponent::OnRep_EquippedWeapon()
+{
+	if (this->EquippedWeapon && this->Character)
+	{
+		this->Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		this->Character->bUseControllerRotationYaw = true;
+	}
 }
 
 void UCombatComponent::SetAiming(bool bIsAiming)
@@ -59,7 +69,8 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 
 	// Set the owner of the weapon to be the character. Note that this is replicated to all clients (see docs).
 	this->EquippedWeapon->SetOwner(this->Character);
-	// Hide the pickup widget
 	
+	this->Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	this->Character->bUseControllerRotationYaw = true;
 }
 

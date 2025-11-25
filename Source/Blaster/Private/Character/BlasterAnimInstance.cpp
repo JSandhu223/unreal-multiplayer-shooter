@@ -4,6 +4,7 @@
 #include "Character/BlasterAnimInstance.h"
 #include "Character/BlasterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 void UBlasterAnimInstance::NativeInitializeAnimation()
@@ -36,4 +37,9 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsCrouched = BlasterCharacter->bIsCrouched;
 
 	bAiming = BlasterCharacter->IsAiming();
+
+	FRotator AimRotation = BlasterCharacter->GetBaseAimRotation();
+	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(BlasterCharacter->GetVelocity());
+	YawOffset = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw;
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).ToString());
 }
