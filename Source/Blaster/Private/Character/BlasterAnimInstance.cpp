@@ -41,7 +41,13 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	// Offset Yaw for strafing
 	FRotator AimRotation = BlasterCharacter->GetBaseAimRotation();
 	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(BlasterCharacter->GetVelocity());
-	YawOffset = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw;
+	FRotator DeltaRot = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation);
+	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRot, DeltaTime, 6.0f);
+	YawOffset = DeltaRotation.Yaw;
+	//UE_LOG(LogTemp, Warning, TEXT("AimRotation: %s"), *AimRotation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("MovementRotation: %s"), *MovementRotation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("NormalizedDeltaRotator: %s"), *(UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).ToString()));
+	//UE_LOG(LogTemp, Warning, TEXT("====================================================="));
 
 	CharacterRotationLastFrame = CharacterRotation;
 	CharacterRotation = BlasterCharacter->GetActorRotation();
