@@ -44,4 +44,9 @@ public:
 	void ServerSetAiming(bool bIsAiming);
 
 private:
+	UPROPERTY(EditAnywhere)
+	float BaseWalkSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float AimWalkSpeed;
 };
