@@ -11,6 +11,7 @@
 #include "BlasterComponents/CombatComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 ABlasterCharacter::ABlasterCharacter()
@@ -61,10 +62,12 @@ void ABlasterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (this->OverlappingWeapon)
+	/*if (this->OverlappingWeapon)
 	{
 		this->OverlappingWeapon->ShowPickupWidget(true);
-	}
+	}*/
+
+	AimOffset(DeltaTime);
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -80,6 +83,36 @@ void ABlasterCharacter::PostInitializeComponents()
 	{
 		this->Combat->Character = this;
 	}
+}
+
+void ABlasterCharacter::AimOffset(float DeltaTime)
+{
+	if (this->Combat && this->Combat->EquippedWeapon == nullptr) { return; }
+
+	FVector Velocity = this->GetVelocity();
+	Velocity.Z = 0.0f;
+	float Speed = Velocity.Size();
+
+	bool bIsInAir = this->GetCharacterMovement()->IsFalling();
+
+	// Standing still and not jumping
+	if (Speed == 0.0f && !bIsInAir)
+	{
+		FRotator CurrentAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, this->StartingAimRotation);
+		this->AO_Yaw = DeltaAimRotation.Yaw;
+		this->bUseControllerRotationYaw = false;
+	}
+	
+	// Running or jumping
+	if (Speed > 0.0f || bIsInAir)
+	{
+		this->StartingAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		this->AO_Yaw = 0.0f;
+		this->bUseControllerRotationYaw = true;
+	}
+
+	this->AO_Pitch = GetBaseAimRotation().Pitch;
 }
 
 void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
@@ -117,6 +150,16 @@ AWeapon* ABlasterCharacter::GetOverlappingWeapon()
 UCombatComponent* ABlasterCharacter::GetCombatComponent()
 {
 	return this->Combat;
+}
+
+float ABlasterCharacter::GetAO_Yaw() const
+{
+	return this->AO_Yaw;
+}
+
+float ABlasterCharacter::GetAO_Pitch() const
+{
+	return this->AO_Pitch;
 }
 
 void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)

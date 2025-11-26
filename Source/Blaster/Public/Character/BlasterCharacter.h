@@ -26,6 +26,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Called every frame
+	void AimOffset(float DeltaTime);
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class USpringArmComponent* CameraBoom;
@@ -45,6 +48,10 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* Combat;
 
+	float AO_Yaw;
+	float AO_Pitch;
+	FRotator StartingAimRotation;
+
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
@@ -55,4 +62,8 @@ public:
 	AWeapon* GetOverlappingWeapon();
 
 	UCombatComponent* GetCombatComponent();
+
+	float GetAO_Yaw() const;
+
+	float GetAO_Pitch() const;
 };
