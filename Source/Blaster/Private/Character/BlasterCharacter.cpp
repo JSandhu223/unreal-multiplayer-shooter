@@ -176,6 +176,11 @@ AWeapon* ABlasterCharacter::GetEquippedWeapon()
 	return this->Combat->EquippedWeapon;
 }
 
+ETurningInPlace ABlasterCharacter::GetTurningInPlace() const
+{
+	return this->TurningInPlace;
+}
+
 void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
 	if (this->OverlappingWeapon)
