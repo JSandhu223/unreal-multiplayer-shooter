@@ -66,4 +66,6 @@ public:
 	float GetAO_Yaw() const;
 
 	float GetAO_Pitch() const;
+
+	AWeapon* GetEquippedWeapon();
 };

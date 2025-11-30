@@ -169,6 +169,13 @@ float ABlasterCharacter::GetAO_Pitch() const
 	return this->AO_Pitch;
 }
 
+AWeapon* ABlasterCharacter::GetEquippedWeapon()
+{
+	if (this->Combat == nullptr) { return nullptr; }
+
+	return this->Combat->EquippedWeapon;
+}
+
 void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
 	if (this->OverlappingWeapon)
