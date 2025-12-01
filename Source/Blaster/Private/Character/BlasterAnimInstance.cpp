@@ -13,6 +13,8 @@ void UBlasterAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	BlasterCharacter = Cast<ABlasterCharacter>(TryGetPawnOwner());
+
+	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 }
 
 void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)

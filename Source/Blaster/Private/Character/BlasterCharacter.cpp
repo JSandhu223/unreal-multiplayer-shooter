@@ -102,6 +102,7 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, this->StartingAimRotation);
 		this->AO_Yaw = DeltaAimRotation.Yaw;
 		this->bUseControllerRotationYaw = false;
+		TurnInPlace(DeltaTime);
 	}
 	
 	// Running or jumping
@@ -110,6 +111,7 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		this->StartingAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
 		this->AO_Yaw = 0.0f;
 		this->bUseControllerRotationYaw = true;
+		this->TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 	}
 
 	this->AO_Pitch = GetBaseAimRotation().Pitch;
@@ -119,6 +121,19 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		FVector2D InRange(270.0f, 360.0f);
 		FVector2D OutRange(-90.0f, 0.0f);
 		this->AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, this->AO_Pitch);
+	}
+}
+
+void ABlasterCharacter::TurnInPlace(float DeltaTime)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AO_Yaw: %f"), this->AO_Yaw);
+	if (this->AO_Yaw > 90.0f)
+	{
+		this->TurningInPlace = ETurningInPlace::ETIP_Right;
+	}
+	else if (this->AO_Yaw < -90.0f)
+	{
+		this->TurningInPlace = ETurningInPlace::ETIP_Left;
 	}
 }
 
