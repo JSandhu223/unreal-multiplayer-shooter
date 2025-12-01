@@ -43,6 +43,11 @@ ABlasterCharacter::ABlasterCharacter()
 	// Fixes annoying bug where character collides with camera at certain angles
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+
+	this->NetUpdateFrequency = 66.0f;
+	this->MinNetUpdateFrequency = 33.0f;
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
