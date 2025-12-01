@@ -36,7 +36,7 @@ void ABlasterPlayerController::SetupInputComponent()
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(this->InputComponent);
 
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::DoJump);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABlasterPlayerController::DoJump);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMove);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMouseLook);
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::EquipButtonPressed);
