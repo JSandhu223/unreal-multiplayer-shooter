@@ -36,7 +36,7 @@ void ABlasterPlayerController::SetupInputComponent()
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(this->InputComponent);
 
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoJump);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::DoJump);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMove);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMouseLook);
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::EquipButtonPressed);
@@ -52,9 +52,16 @@ void ABlasterPlayerController::DoJump(const FInputActionValue& InputActionValue)
 	//UE_LOG(LogTemp, Warning, TEXT("Jump value: %f"), Value);
 
 	// For now, we'll just call the existing Jump function from the Character class
-	if (ACharacter* ControlledCharacter = this->GetCharacter())
+	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
 	{
-		ControlledCharacter->Jump();
+		if (BlasterCharacter->bIsCrouched)
+		{
+			BlasterCharacter->UnCrouch();
+		}
+		else
+		{
+			BlasterCharacter->Jump();
+		}
 	}
 }
 
