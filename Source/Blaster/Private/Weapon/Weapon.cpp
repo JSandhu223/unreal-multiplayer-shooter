@@ -123,3 +123,8 @@ USphereComponent* AWeapon::GetAreaSphere() const
 {
 	return this->AreaSphere;
 }
+
+USkeletalMeshComponent* AWeapon::GetWeaponMesh()
+{
+	return this->WeaponMesh;
+}

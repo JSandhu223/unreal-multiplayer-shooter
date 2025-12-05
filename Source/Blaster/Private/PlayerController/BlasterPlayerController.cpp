@@ -36,10 +36,13 @@ void ABlasterPlayerController::SetupInputComponent()
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(this->InputComponent);
 
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoJump);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABlasterPlayerController::DoJump);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMove);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::DoMouseLook);
 	EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::EquipButtonPressed);
+	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::CrouchButtonPressed);
+	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ABlasterPlayerController::AimButtonPressed);
+	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::AimButtonReleased);
 }
 
 void ABlasterPlayerController::DoJump(const FInputActionValue& InputActionValue)
@@ -49,9 +52,16 @@ void ABlasterPlayerController::DoJump(const FInputActionValue& InputActionValue)
 	//UE_LOG(LogTemp, Warning, TEXT("Jump value: %f"), Value);
 
 	// For now, we'll just call the existing Jump function from the Character class
-	if (ACharacter* ControlledCharacter = this->GetCharacter())
+	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
 	{
-		ControlledCharacter->Jump();
+		if (BlasterCharacter->bIsCrouched)
+		{
+			BlasterCharacter->UnCrouch();
+		}
+		else
+		{
+			BlasterCharacter->Jump();
+		}
 	}
 }
 
@@ -113,5 +123,35 @@ void ABlasterPlayerController::ServerEquipButtonPressed_Implementation()
 	if (BlasterCharacter->GetCombatComponent())
 	{
 		BlasterCharacter->GetCombatComponent()->EquipWeapon(BlasterCharacter->GetOverlappingWeapon());
+	}
+}
+
+void ABlasterPlayerController::CrouchButtonPressed(const FInputActionValue& InputActionValue)
+{
+	if (ACharacter* ControlledCharacter = this->GetCharacter())
+	{
+		ControlledCharacter->bIsCrouched ? ControlledCharacter->UnCrouch() : ControlledCharacter->Crouch();
+	}
+}
+
+void ABlasterPlayerController::AimButtonPressed(const FInputActionValue& InputActionValue)
+{
+	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
+	{
+		if (BlasterCharacter->GetCombatComponent())
+		{
+			BlasterCharacter->GetCombatComponent()->SetAiming(true);
+		}
+	}
+}
+
+void ABlasterPlayerController::AimButtonReleased(const FInputActionValue& InputActionValue)
+{
+	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
+	{
+		if (BlasterCharacter->GetCombatComponent())
+		{
+			BlasterCharacter->GetCombatComponent()->SetAiming(false);
+		}
 	}
 }

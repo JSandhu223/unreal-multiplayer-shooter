@@ -6,10 +6,12 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "BlasterComponents/CombatComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 ABlasterCharacter::ABlasterCharacter()
@@ -36,6 +38,17 @@ ABlasterCharacter::ABlasterCharacter()
 
 	this->Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	this->Combat->SetIsReplicated(true);
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	// Fixes annoying bug where character collides with camera at certain angles
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 850.0f);
+
+	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+
+	this->NetUpdateFrequency = 66.0f;
+	this->MinNetUpdateFrequency = 33.0f;
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -55,10 +68,12 @@ void ABlasterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (this->OverlappingWeapon)
+	/*if (this->OverlappingWeapon)
 	{
 		this->OverlappingWeapon->ShowPickupWidget(true);
-	}
+	}*/
+
+	AimOffset(DeltaTime);
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -73,6 +88,73 @@ void ABlasterCharacter::PostInitializeComponents()
 	if (this->Combat)
 	{
 		this->Combat->Character = this;
+	}
+}
+
+void ABlasterCharacter::AimOffset(float DeltaTime)
+{
+	if (this->Combat && this->Combat->EquippedWeapon == nullptr) { return; }
+
+	FVector Velocity = this->GetVelocity();
+	Velocity.Z = 0.0f;
+	float Speed = Velocity.Size();
+
+	bool bIsInAir = this->GetCharacterMovement()->IsFalling();
+
+	// Standing still and not jumping
+	if (Speed == 0.0f && !bIsInAir)
+	{
+		FRotator CurrentAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, this->StartingAimRotation);
+		AO_Yaw = DeltaAimRotation.Yaw;
+		if (TurningInPlace == ETurningInPlace::ETIP_NotTurning)
+		{
+			InterpAO_Yaw = AO_Yaw;
+		}
+		bUseControllerRotationYaw = true;
+		TurnInPlace(DeltaTime);
+	}
+	
+	// Running or jumping
+	if (Speed > 0.0f || bIsInAir)
+	{
+		this->StartingAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		this->AO_Yaw = 0.0f;
+		this->bUseControllerRotationYaw = true;
+		this->TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+	}
+
+	this->AO_Pitch = GetBaseAimRotation().Pitch;
+	if (this->AO_Pitch > 90.0f && !this->IsLocallyControlled())
+	{
+		// Map pitch from [270, 360) to [-90, 0)
+		FVector2D InRange(270.0f, 360.0f);
+		FVector2D OutRange(-90.0f, 0.0f);
+		this->AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, this->AO_Pitch);
+	}
+}
+
+void ABlasterCharacter::TurnInPlace(float DeltaTime)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("AO_Yaw: %f"), AO_Yaw);
+	if (AO_Yaw > 90.0f)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_Right;
+	}
+	else if (AO_Yaw < -90.0f)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_Left;
+	}
+
+	if (TurningInPlace != ETurningInPlace::ETIP_NotTurning)
+	{
+		InterpAO_Yaw = FMath::FInterpTo(InterpAO_Yaw, 0.0f, DeltaTime, 4.0f);
+		AO_Yaw = InterpAO_Yaw;
+		if (FMath::Abs(AO_Yaw) < 15.0f)
+		{
+			TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+			StartingAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		}
 	}
 }
 
@@ -93,6 +175,16 @@ void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 	}
 }
 
+bool ABlasterCharacter::IsWeaponEquipped()
+{
+	return (this->Combat && this->Combat->EquippedWeapon);
+}
+
+bool ABlasterCharacter::IsAiming()
+{
+	return (this->Combat && this->Combat->bAiming);
+}
+
 AWeapon* ABlasterCharacter::GetOverlappingWeapon()
 {
 	return this->OverlappingWeapon;
@@ -101,6 +193,28 @@ AWeapon* ABlasterCharacter::GetOverlappingWeapon()
 UCombatComponent* ABlasterCharacter::GetCombatComponent()
 {
 	return this->Combat;
+}
+
+float ABlasterCharacter::GetAO_Yaw() const
+{
+	return this->AO_Yaw;
+}
+
+float ABlasterCharacter::GetAO_Pitch() const
+{
+	return this->AO_Pitch;
+}
+
+AWeapon* ABlasterCharacter::GetEquippedWeapon()
+{
+	if (this->Combat == nullptr) { return nullptr; }
+
+	return this->Combat->EquippedWeapon;
+}
+
+ETurningInPlace ABlasterCharacter::GetTurningInPlace() const
+{
+	return this->TurningInPlace;
 }
 
 void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)

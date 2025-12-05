@@ -6,21 +6,67 @@
 #include "Character/BlasterCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+
+	this->BaseWalkSpeed = 600.0f;
+	this->AimWalkSpeed = 450.0f;
 }
 
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (this->Character)
+	{
+		this->Character->GetCharacterMovement()->MaxWalkSpeed = this->BaseWalkSpeed;
+	}
+}
+
+void UCombatComponent::OnRep_EquippedWeapon()
+{
+	if (this->EquippedWeapon && this->Character)
+	{
+		this->Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		this->Character->bUseControllerRotationYaw = true;
+	}
+}
+
+void UCombatComponent::SetAiming(bool bIsAiming)
+{
+	this->bAiming = bIsAiming;
+	ServerSetAiming(bIsAiming);
+	if (this->Character)
+	{
+		this->Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	}
+}
+
+void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
+{
+	this->bAiming = bIsAiming;
+	if (this->Character)
+	{
+		this->Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	}
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UCombatComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UCombatComponent, bAiming);
 }
 
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
@@ -39,7 +85,8 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 
 	// Set the owner of the weapon to be the character. Note that this is replicated to all clients (see docs).
 	this->EquippedWeapon->SetOwner(this->Character);
-	// Hide the pickup widget
 	
+	this->Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	this->Character->bUseControllerRotationYaw = true;
 }
 
