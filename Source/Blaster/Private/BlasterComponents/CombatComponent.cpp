@@ -40,6 +40,11 @@ void UCombatComponent::OnRep_EquippedWeapon()
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
 	bFireButtonPressed = bPressed;
+
+	if (this->Character && bFireButtonPressed)
+	{
+		this->Character->PlayFireMontage(this->bAiming);
+	}
 }
 
 void UCombatComponent::SetAiming(bool bIsAiming)

@@ -43,7 +43,7 @@ void ABlasterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::CrouchButtonPressed);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ABlasterPlayerController::AimButtonPressed);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::AimButtonReleased);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ABlasterPlayerController::FireButtonPressed);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::FireButtonPressed);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::FireButtonReleased);
 }
 
@@ -160,14 +160,14 @@ void ABlasterPlayerController::AimButtonReleased(const FInputActionValue& InputA
 
 void ABlasterPlayerController::FireButtonPressed(const FInputActionValue& InputActionValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fire button pressed!"));
-
 	bool InputValue = InputActionValue.Get<bool>();
 	//InputValue ? TEXT("True") : TEXT("False");
 	//UE_LOG(LogTemp, Warning, TEXT("InputValue: %s"), InputValue ? TEXT("True") : TEXT("False"))
 
 	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("Fire button pressed!"));
+
 		if (BlasterCharacter->GetCombatComponent())
 		{
 			BlasterCharacter->GetCombatComponent()->FireButtonPressed(InputValue); // InputValue will be TRUE here
@@ -177,13 +177,13 @@ void ABlasterPlayerController::FireButtonPressed(const FInputActionValue& InputA
 
 void ABlasterPlayerController::FireButtonReleased(const FInputActionValue& InputActionValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fire button released!"));
-
 	bool InputValue = InputActionValue.Get<bool>();
 	//UE_LOG(LogTemp, Warning, TEXT("InputValue: %s"), InputValue ? TEXT("True") : TEXT("False"));
 
 	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("Fire button released!"));
+
 		if (BlasterCharacter->GetCombatComponent())
 		{
 			BlasterCharacter->GetCombatComponent()->FireButtonPressed(InputValue); // InputValue will be FALSE here
