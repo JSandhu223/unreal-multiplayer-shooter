@@ -43,6 +43,8 @@ void ABlasterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::CrouchButtonPressed);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ABlasterPlayerController::AimButtonPressed);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::AimButtonReleased);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ABlasterPlayerController::FireButtonPressed);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::FireButtonReleased);
 }
 
 void ABlasterPlayerController::DoJump(const FInputActionValue& InputActionValue)
@@ -154,4 +156,14 @@ void ABlasterPlayerController::AimButtonReleased(const FInputActionValue& InputA
 			BlasterCharacter->GetCombatComponent()->SetAiming(false);
 		}
 	}
+}
+
+void ABlasterPlayerController::FireButtonPressed(const FInputActionValue& InputActionValue)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fire button pressed!"));
+}
+
+void ABlasterPlayerController::FireButtonReleased(const FInputActionValue& InputActionValue)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fire button released!"));
 }
