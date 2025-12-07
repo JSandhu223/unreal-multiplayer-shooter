@@ -43,7 +43,7 @@ void ABlasterPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::CrouchButtonPressed);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ABlasterPlayerController::AimButtonPressed);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::AimButtonReleased);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ABlasterPlayerController::FireButtonPressed);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ABlasterPlayerController::FireButtonPressed);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ABlasterPlayerController::FireButtonReleased);
 }
 
