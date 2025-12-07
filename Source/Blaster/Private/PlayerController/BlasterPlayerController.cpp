@@ -161,9 +161,32 @@ void ABlasterPlayerController::AimButtonReleased(const FInputActionValue& InputA
 void ABlasterPlayerController::FireButtonPressed(const FInputActionValue& InputActionValue)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire button pressed!"));
+
+	bool InputValue = InputActionValue.Get<bool>();
+	//InputValue ? TEXT("True") : TEXT("False");
+	//UE_LOG(LogTemp, Warning, TEXT("InputValue: %s"), InputValue ? TEXT("True") : TEXT("False"))
+
+	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
+	{
+		if (BlasterCharacter->GetCombatComponent())
+		{
+			BlasterCharacter->GetCombatComponent()->FireButtonPressed(InputValue); // InputValue will be TRUE here
+		}
+	}
 }
 
 void ABlasterPlayerController::FireButtonReleased(const FInputActionValue& InputActionValue)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire button released!"));
+
+	bool InputValue = InputActionValue.Get<bool>();
+	//UE_LOG(LogTemp, Warning, TEXT("InputValue: %s"), InputValue ? TEXT("True") : TEXT("False"));
+
+	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(this->GetCharacter()))
+	{
+		if (BlasterCharacter->GetCombatComponent())
+		{
+			BlasterCharacter->GetCombatComponent()->FireButtonPressed(InputValue); // InputValue will be FALSE here
+		}
+	}
 }
