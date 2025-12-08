@@ -45,6 +45,12 @@ public:
 
 	void FireButtonPressed(bool bPressed);
 
+	UFUNCTION(Server, Reliable)
+	void ServerFire();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastFire();
+
 private:
 	UPROPERTY(EditAnywhere)
 	float BaseWalkSpeed;
