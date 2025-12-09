@@ -85,6 +85,7 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void ABlasterCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+	this->Combat->PrimaryComponentTick.bCanEverTick = true;
 
 	if (this->Combat)
 	{

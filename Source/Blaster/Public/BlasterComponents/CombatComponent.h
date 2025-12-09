@@ -51,6 +51,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFire();
 
+	void TraceUnderCrosshairs(struct FHitResult& TraceHitResult);
+
 private:
 	UPROPERTY(EditAnywhere)
 	float BaseWalkSpeed;
