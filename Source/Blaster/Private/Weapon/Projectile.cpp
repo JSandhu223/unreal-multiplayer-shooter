@@ -1,5 +1,6 @@
 #include "Weapon/Projectile.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 
 AProjectile::AProjectile()
@@ -13,6 +14,9 @@ AProjectile::AProjectile()
 	this->CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	this->CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	this->CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+
+	this->ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	this->ProjectileMovementComponent->bRotationFollowsVelocity = true;
 }
 
 void AProjectile::BeginPlay()
