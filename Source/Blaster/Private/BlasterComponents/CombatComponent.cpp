@@ -69,7 +69,7 @@ void UCombatComponent::MulticastFire_Implementation()
 	if (this->Character)
 	{
 		this->Character->PlayFireMontage(this->bAiming);
-		this->EquippedWeapon->Fire();
+		this->EquippedWeapon->Fire(this->HitTarget);
 	}
 }
 
@@ -109,9 +109,11 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		if (!TraceHitResult.bBlockingHit)
 		{
 			TraceHitResult.ImpactPoint = End;
+			HitTarget = End;
 			return;
 		}
 
+		HitTarget = TraceHitResult.ImpactPoint;
 		DrawDebugSphere(
 			GetWorld(),
 			TraceHitResult.ImpactPoint,
