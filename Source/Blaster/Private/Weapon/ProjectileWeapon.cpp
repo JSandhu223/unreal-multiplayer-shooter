@@ -7,6 +7,9 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 {
 	Super::Fire(HitTarget);
 
+	// The projectile logic should only be handled by the server to prevent clients from cheating
+	if (!HasAuthority()) { return; }
+
 	APawn* InstigatorPawn = Cast<APawn>(this->GetOwner());
 
 	const USkeletalMeshSocket* MuzzleFlashSocket = this->GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash"));
