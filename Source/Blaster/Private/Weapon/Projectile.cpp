@@ -28,14 +28,14 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (Tracer)
+	if (this->Tracer)
 	{
 		this->TracerComponent = UGameplayStatics::SpawnEmitterAttached(
 			this->Tracer,
 			this->CollisionBox,
 			FName(),
-			GetActorLocation(),
-			GetActorRotation(),
+			this->GetActorLocation(),
+			this->GetActorRotation(),
 			EAttachLocation::KeepWorldPosition
 		);
 	}

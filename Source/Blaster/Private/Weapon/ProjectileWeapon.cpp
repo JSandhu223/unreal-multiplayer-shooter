@@ -17,7 +17,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 	{
 		FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(this->GetWeaponMesh());
 
-		// vector from barrel to the target hit location by the line trace
+		// This is the vector going from weapon barrel to the target hit location by the line trace
 		FVector ToTarget = HitTarget - SocketTransform.GetLocation();
 		// Get the rotation of the vector going from the barrel of the weapon to the hit location. This ensure the projectile is oriented towards to hit target when firing.
 		FRotator TargetRotation = ToTarget.Rotation();
@@ -38,7 +38,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 				World->SpawnActor<AProjectile>(
 					ProjectileClass,
 					SocketTransform.GetLocation(),
-					TargetRotation,				
+					TargetRotation,
 					SpawnParams
 				);
 			}

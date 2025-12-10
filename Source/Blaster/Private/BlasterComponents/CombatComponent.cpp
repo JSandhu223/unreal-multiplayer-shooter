@@ -53,23 +53,25 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	
 	if (bFireButtonPressed)
 	{
-		ServerFire();
+		FHitResult HitResult;
+		TraceUnderCrosshairs(HitResult);
+		ServerFire(HitResult.ImpactPoint);
 	}
 }
 
-void UCombatComponent::ServerFire_Implementation()
+void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	MulticastFire();
+	MulticastFire(TraceHitTarget);
 }
 
-void UCombatComponent::MulticastFire_Implementation()
+void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if (this->EquippedWeapon == nullptr) { return; }
 
 	if (this->Character)
 	{
 		this->Character->PlayFireMontage(this->bAiming);
-		this->EquippedWeapon->Fire(this->HitTarget);
+		this->EquippedWeapon->Fire(TraceHitTarget);
 	}
 }
 
@@ -109,11 +111,9 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		if (!TraceHitResult.bBlockingHit)
 		{
 			TraceHitResult.ImpactPoint = End;
-			HitTarget = End;
 			return;
 		}
 
-		HitTarget = TraceHitResult.ImpactPoint;
 		DrawDebugSphere(
 			GetWorld(),
 			TraceHitResult.ImpactPoint,
@@ -146,9 +146,6 @@ void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	FHitResult HitResult;
-	TraceUnderCrosshairs(HitResult);
 }
 
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
