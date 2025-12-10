@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Sound/SoundCue.h"
 
 
 AProjectile::AProjectile()
@@ -39,6 +40,17 @@ void AProjectile::BeginPlay()
 			EAttachLocation::KeepWorldPosition
 		);
 	}
+
+	if (HasAuthority())
+	{
+		this->CollisionBox->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	}
+}
+
+void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	// The destruction of this actor will get replicated down to the clients since we set 'bReplicates = true' in the constructor
+	this->Destroy();
 }
 
 // Called every frame
@@ -46,5 +58,28 @@ void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AProjectile::Destroyed()
+{
+	Super::Destroyed();
+
+	if (this->ImpactParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(),
+			this->ImpactParticles,
+			this->GetActorTransform()
+		);
+	}
+
+	if (this->ImpactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			this->ImpactSound,
+			this->GetActorLocation()
+		);
+	}
 }
 
