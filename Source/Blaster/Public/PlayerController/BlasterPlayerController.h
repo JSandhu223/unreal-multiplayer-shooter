@@ -52,6 +52,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
 	class UInputAction* AimAction;
 
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input|Input Actions")
+	class UInputAction* FireAction;
+
 protected:
 	void DoJump(const struct FInputActionValue& InputActionValue);
 
@@ -66,4 +69,8 @@ protected:
 	void AimButtonPressed(const FInputActionValue& InputActionValue);
 
 	void AimButtonReleased(const FInputActionValue& InputActionValue);
+
+	void FireButtonPressed(const FInputActionValue& InputActionValue);
+
+	void FireButtonReleased(const FInputActionValue& InputActionValue);
 };

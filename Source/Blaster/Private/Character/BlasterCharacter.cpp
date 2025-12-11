@@ -2,6 +2,7 @@
 
 
 #include "Character/BlasterCharacter.h"
+#include "Character/BlasterAnimInstance.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -84,10 +85,26 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void ABlasterCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+	this->Combat->PrimaryComponentTick.bCanEverTick = true;
 
 	if (this->Combat)
 	{
 		this->Combat->Character = this;
+	}
+}
+
+void ABlasterCharacter::PlayFireMontage(bool bAiming)
+{
+	if (this->Combat == nullptr || this->Combat->EquippedWeapon == nullptr) { return; }
+
+	UAnimInstance* AnimInstance = this->GetMesh()->GetAnimInstance();
+	if (AnimInstance && this->FireWeaponMontage)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("AnimInstance: %s"), *AnimInstance->GetName());
+		AnimInstance->Montage_Play(this->FireWeaponMontage);
+		// Play the appropriate section of the anim montage
+		FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		AnimInstance->Montage_JumpToSection(SectionName);
 	}
 }
 
