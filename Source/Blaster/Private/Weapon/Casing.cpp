@@ -18,6 +18,8 @@ ACasing::ACasing()
 	this->CasingMesh->SetNotifyRigidBodyCollision(true);
 
 	this->ShellEjectionImpulse = 10.0f;
+
+	this->SetLifeSpan(2.0f);
 }
 
 void ACasing::BeginPlay()
@@ -30,10 +32,14 @@ void ACasing::BeginPlay()
 
 void ACasing::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	// DEBUG
+	//UE_LOG(LogTemp, Warning, TEXT("ACasing: Hit event generated!"));
+
 	if (this->ShellSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, this->ShellSound, this->GetActorLocation());
 	}
 
-	this->Destroy();
+	// Turning this off prevents multiple hit events from being generated, thus preventing more than one shell sound from playing
+	this->CasingMesh->SetNotifyRigidBodyCollision(false);
 }
