@@ -77,6 +77,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACasing> CasingClass;
 
+public:
 	/*
 	* Textures for the weapon crosshairs
 	*/

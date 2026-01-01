@@ -8,5 +8,11 @@ void ABlasterHUD::DrawHUD()
 {
 	Super::DrawHUD();
 
+	// Draw crosshairs
 
+}
+
+void ABlasterHUD::SetHUDPackage(const FHUDPackage& Package)
+{
+	this->HUDPackage = Package;
 }
