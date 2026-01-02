@@ -82,4 +82,6 @@ public:
 	ETurningInPlace GetTurningInPlace() const;
 
 	FVector GetHitTarget() const;
+
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };

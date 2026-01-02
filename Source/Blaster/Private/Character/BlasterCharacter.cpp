@@ -20,25 +20,28 @@ ABlasterCharacter::ABlasterCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	this->CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	this->CameraBoom->SetupAttachment(GetMesh());
-	this->CameraBoom->TargetArmLength = 600.0f;
-	this->CameraBoom->bUsePawnControlRotation = true; // allow the camera boom to rotate along with the controller (i.e. mouse movement)
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(GetMesh());
+	CameraBoom->TargetArmLength = 600.0f;
+	CameraBoom->bUsePawnControlRotation = true; // allow the camera boom to rotate along with the controller (i.e. mouse movement)
 
-	this->FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	this->FollowCamera->SetupAttachment(this->CameraBoom, USpringArmComponent::SocketName);
-	this->FollowCamera->bUsePawnControlRotation = false;
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->bUsePawnControlRotation = false;
+	// Adjust depth of field settings to reduce blur when zooming in while aiming
+	FollowCamera->PostProcessSettings.DepthOfFieldFocalDistance = 10000.0f;
+	FollowCamera->PostProcessSettings.DepthOfFieldFstop = 32.0f;
 
 	// Prevents character from rotating along with the controller rotation
 	bUseControllerRotationYaw = false;
 	// Makes the character face toward the direction of movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	this->OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
-	this->OverheadWidget->SetupAttachment(this->RootComponent);
+	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
+	OverheadWidget->SetupAttachment(RootComponent);
 
-	this->Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	this->Combat->SetIsReplicated(true);
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	Combat->SetIsReplicated(true);
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	// Fixes annoying bug where character collides with camera at certain angles
@@ -48,8 +51,8 @@ ABlasterCharacter::ABlasterCharacter()
 
 	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 
-	this->NetUpdateFrequency = 66.0f;
-	this->MinNetUpdateFrequency = 33.0f;
+	NetUpdateFrequency = 66.0f;
+	MinNetUpdateFrequency = 33.0f;
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

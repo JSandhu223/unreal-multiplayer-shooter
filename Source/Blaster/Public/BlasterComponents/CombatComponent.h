@@ -77,4 +77,23 @@ private:
 	float CrosshairInAirFactor;
 
 	FVector HitTarget;
+
+	/*
+	* Aiming and FOV
+	*/
+
+	// Field of view when not aiming set to the target's base FOV in BeginPlay
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	float DefaultFOV;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float ZoomedFOV = 30.0f;
+
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	float CurrentFOV;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float ZoomInterpSpeed = 20.0f;
+
+	void InterpFOV(float DeltaTime);
 };
