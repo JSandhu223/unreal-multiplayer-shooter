@@ -80,4 +80,6 @@ public:
 	AWeapon* GetEquippedWeapon();
 
 	ETurningInPlace GetTurningInPlace() const;
+
+	FVector GetHitTarget() const;
 };

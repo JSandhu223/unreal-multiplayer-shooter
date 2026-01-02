@@ -234,6 +234,13 @@ ETurningInPlace ABlasterCharacter::GetTurningInPlace() const
 	return this->TurningInPlace;
 }
 
+FVector ABlasterCharacter::GetHitTarget() const
+{
+	if (Combat == nullptr) { return FVector(); }
+
+	return Combat->HitTarget;
+}
+
 void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
 	if (this->OverlappingWeapon)
