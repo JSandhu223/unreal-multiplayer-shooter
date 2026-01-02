@@ -7,8 +7,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerController/BlasterPlayerController.h"
-#include "HUD/BlasterHUD.h"
 #include "Camera/CameraComponent.h"
+#include "Interfaces/InteractWithCrosshairsInterface.h"
 
 
 UCombatComponent::UCombatComponent()
@@ -70,7 +70,6 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 
 		if (HUD)
 		{
-			FHUDPackage HUDPackage;
 			if (EquippedWeapon)
 			{
 				HUDPackage.CrosshairsCenter = EquippedWeapon->CrosshairsCenter;
@@ -118,7 +117,7 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 			// The shooting factor should always be interpolating back to zero so that the crosshair shrinks when the player stops shooting
 			CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.0f, DeltaTime, 20.0f);
 
-			HUDPackage.CrosshairSpread = BaselineSpread + CrosshairVelocityFactor + CrosshairInAirFactor + CrosshairAimFactor + CrosshairShootingFactor;
+			HUDPackage.CrosshairsSpread = BaselineSpread + CrosshairVelocityFactor + CrosshairInAirFactor + CrosshairAimFactor + CrosshairShootingFactor;
 
 			HUD->SetHUDPackage(HUDPackage);
 		}
@@ -217,6 +216,16 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 			End,
 			ECollisionChannel::ECC_Visibility
 		);
+
+		// Draw red crosshairs when crosshairs are over another character
+		if (TraceHitResult.GetActor() && TraceHitResult.GetActor()->Implements<UInteractWithCrosshairsInterface>())
+		{
+			HUDPackage.CrosshairsColor = FLinearColor::Red;
+		}
+		else
+		{
+			HUDPackage.CrosshairsColor = FLinearColor::White;
+		}
 
 		// If the line trace didn't hit anything, manually set the impact point
 		if (!TraceHitResult.bBlockingHit)

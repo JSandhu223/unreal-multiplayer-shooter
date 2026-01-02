@@ -72,10 +72,11 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		{
 			this->bLocallyControlled = true;
 			FTransform RightHandTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("Hand_R"), ERelativeTransformSpace::RTS_World);
-			this->RightHandRotation = UKismetMathLibrary::FindLookAtRotation(
+			FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(
 				RightHandTransform.GetLocation(),
 				RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - BlasterCharacter->GetHitTarget())
 			);
+			this->RightHandRotation = FMath::RInterpConstantTo(RightHandRotation, LookAtRotation, DeltaTime, 30.0f);
 
 			//FTransform MuzzleTipTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("MuzzleFlash"), ERelativeTransformSpace::RTS_World);
 			//// Get the direction of the x-axis corresponding the muzzle tip rotation

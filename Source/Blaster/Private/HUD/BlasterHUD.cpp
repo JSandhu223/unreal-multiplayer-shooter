@@ -15,36 +15,36 @@ void ABlasterHUD::DrawHUD()
 		GEngine->GameViewport->GetViewportSize(ViewportSize);
 		const FVector2D ViewportCenter(ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f);
 
-		float SpreadScaled = CrosshairSpreadMax * HUDPackage.CrosshairSpread;
+		float SpreadScaled = CrosshairSpreadMax * HUDPackage.CrosshairsSpread;
 
 		if (HUDPackage.CrosshairsCenter)
 		{
-			DrawCrosshair(HUDPackage.CrosshairsCenter, ViewportCenter, FVector2D::ZeroVector);
+			DrawCrosshair(HUDPackage.CrosshairsCenter, ViewportCenter, FVector2D::ZeroVector, HUDPackage.CrosshairsColor);
 		}
 
 		if (HUDPackage.CrosshairsLeft)
 		{
-			DrawCrosshair(HUDPackage.CrosshairsLeft, ViewportCenter, FVector2D(-SpreadScaled, 0.0f));
+			DrawCrosshair(HUDPackage.CrosshairsLeft, ViewportCenter, FVector2D(-SpreadScaled, 0.0f), HUDPackage.CrosshairsColor);
 		}
 
 		if (HUDPackage.CrosshairsRight)
 		{
-			DrawCrosshair(HUDPackage.CrosshairsRight, ViewportCenter, FVector2D(SpreadScaled, 0.0f));
+			DrawCrosshair(HUDPackage.CrosshairsRight, ViewportCenter, FVector2D(SpreadScaled, 0.0f), HUDPackage.CrosshairsColor);
 		}
 
 		if (HUDPackage.CrosshairsTop)
 		{
-			DrawCrosshair(HUDPackage.CrosshairsTop, ViewportCenter, FVector2D(0.0f, -SpreadScaled));
+			DrawCrosshair(HUDPackage.CrosshairsTop, ViewportCenter, FVector2D(0.0f, -SpreadScaled), HUDPackage.CrosshairsColor);
 		}
 
 		if (HUDPackage.CrosshairsBottom)
 		{
-			DrawCrosshair(HUDPackage.CrosshairsBottom, ViewportCenter, FVector2D(0.0f, SpreadScaled));
+			DrawCrosshair(HUDPackage.CrosshairsBottom, ViewportCenter, FVector2D(0.0f, SpreadScaled), HUDPackage.CrosshairsColor);
 		}
 	}
 }
 
-void ABlasterHUD::DrawCrosshair(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread)
+void ABlasterHUD::DrawCrosshair(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor)
 {
 	const float TextureWidth = Texture->GetSizeX();
 	const float TextureHeight = Texture->GetSizeY();
@@ -63,7 +63,7 @@ void ABlasterHUD::DrawCrosshair(UTexture2D* Texture, FVector2D ViewportCenter, F
 		0.0f,
 		1.0f,
 		1.0f,
-		FLinearColor::White
+		CrosshairColor
 	);
 }
 
