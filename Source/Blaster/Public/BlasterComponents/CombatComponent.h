@@ -71,17 +71,16 @@ private:
 	/**
 	* HUD and crosshairs	
 	*/
-
 	float CrosshairVelocityFactor;
-
 	float CrosshairInAirFactor;
+	float CrosshairAimFactor;
+	float CrosshairShootingFactor;
 
 	FVector HitTarget;
 
 	/*
 	* Aiming and FOV
 	*/
-
 	// Field of view when not aiming set to the target's base FOV in BeginPlay
 	UPROPERTY(VisibleAnywhere, Category = "Combat")
 	float DefaultFOV;
