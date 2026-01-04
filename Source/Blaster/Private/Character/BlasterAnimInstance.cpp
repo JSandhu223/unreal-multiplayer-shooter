@@ -76,7 +76,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 				RightHandTransform.GetLocation(),
 				RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - BlasterCharacter->GetHitTarget())
 			);
-			this->RightHandRotation = FMath::RInterpConstantTo(RightHandRotation, LookAtRotation, DeltaTime, 30.0f);
+			this->RightHandRotation = FMath::RInterpConstantTo(RightHandRotation, LookAtRotation, DeltaTime, 200.0f);
 
 			//FTransform MuzzleTipTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("MuzzleFlash"), ERelativeTransformSpace::RTS_World);
 			//// Get the direction of the x-axis corresponding the muzzle tip rotation

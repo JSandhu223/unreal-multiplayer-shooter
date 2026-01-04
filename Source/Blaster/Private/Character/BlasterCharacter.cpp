@@ -79,6 +79,8 @@ void ABlasterCharacter::Tick(float DeltaTime)
 	}*/
 
 	AimOffset(DeltaTime);
+
+	HideCharacter();
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -175,6 +177,35 @@ void ABlasterCharacter::TurnInPlace(float DeltaTime)
 		{
 			TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 			StartingAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		}
+	}
+}
+
+void ABlasterCharacter::HideCharacter()
+{
+	if (!IsLocallyControlled()) { return; }
+
+	if ((FollowCamera->GetComponentLocation() - GetActorLocation()).Size() < CameraThreshold)
+	{
+		// Note: the character will not be hidden on other machines
+		GetMesh()->SetVisibility(false);
+
+		// Also hide weapon if equipped
+		if (Combat && Combat->EquippedWeapon && Combat->EquippedWeapon->GetWeaponMesh())
+		{
+			Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = true;
+		}
+	}
+
+	else
+	{
+		// Note: the character will not be hidden on other machines
+		GetMesh()->SetVisibility(true);
+
+		// Also hide weapon if equipped
+		if (Combat && Combat->EquippedWeapon && Combat->EquippedWeapon->GetWeaponMesh())
+		{
+			Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
 		}
 	}
 }
