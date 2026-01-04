@@ -69,6 +69,14 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION(ABlasterCharacter, OverlappingWeapon, COND_OwnerOnly);
 }
 
+void ABlasterCharacter::OnRep_ReplicatedMovement()
+{
+	Super::OnRep_ReplicatedMovement();
+
+	SimProxiesTurn();
+	TimeSinceLastMovementReplication = 0.0f;
+}
+
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();	
@@ -83,7 +91,19 @@ void ABlasterCharacter::Tick(float DeltaTime)
 		this->OverlappingWeapon->ShowPickupWidget(true);
 	}*/
 
-	AimOffset(DeltaTime);
+	if (GetLocalRole() > ENetRole::ROLE_SimulatedProxy && IsLocallyControlled())
+	{
+		AimOffset(DeltaTime);
+	}
+	else
+	{
+		TimeSinceLastMovementReplication += DeltaTime;
+		if (TimeSinceLastMovementReplication > 0.25f)
+		{
+			OnRep_ReplicatedMovement();
+		}
+		CalculateAO_Pitch();
+	}
 
 	HideCharacter();
 }
@@ -139,21 +159,26 @@ void ABlasterCharacter::MulticastHit_Implementation()
 	PlayHitReactMontage();
 }
 
-void ABlasterCharacter::AimOffset(float DeltaTime)
+float ABlasterCharacter::CalculateSpeed()
 {
-	if (this->Combat && this->Combat->EquippedWeapon == nullptr) { return; }
-
 	FVector Velocity = this->GetVelocity();
 	Velocity.Z = 0.0f;
-	float Speed = Velocity.Size();
+	return Velocity.Size();
+}
 
-	bool bIsInAir = this->GetCharacterMovement()->IsFalling();
+void ABlasterCharacter::AimOffset(float DeltaTime)
+{
+	if (Combat && Combat->EquippedWeapon == nullptr) { return; }
+
+	float Speed = CalculateSpeed();
+	bool bIsInAir = GetCharacterMovement()->IsFalling();
 
 	// Standing still and not jumping
 	if (Speed == 0.0f && !bIsInAir)
 	{
+		bRotateRootBone = true;
 		FRotator CurrentAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
-		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, this->StartingAimRotation);
+		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
 		if (TurningInPlace == ETurningInPlace::ETIP_NotTurning)
 		{
@@ -166,20 +191,67 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 	// Running or jumping
 	if (Speed > 0.0f || bIsInAir)
 	{
-		this->StartingAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
-		this->AO_Yaw = 0.0f;
-		this->bUseControllerRotationYaw = true;
-		this->TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+		bRotateRootBone = false;
+		StartingAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		AO_Yaw = 0.0f;
+		bUseControllerRotationYaw = true;
+		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 	}
 
-	this->AO_Pitch = GetBaseAimRotation().Pitch;
-	if (this->AO_Pitch > 90.0f && !this->IsLocallyControlled())
+	CalculateAO_Pitch();
+}
+
+void ABlasterCharacter::CalculateAO_Pitch()
+{
+	AO_Pitch = GetBaseAimRotation().Pitch;
+	if (AO_Pitch > 90.0f && !this->IsLocallyControlled())
 	{
 		// Map pitch from [270, 360) to [-90, 0)
 		FVector2D InRange(270.0f, 360.0f);
 		FVector2D OutRange(-90.0f, 0.0f);
-		this->AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, this->AO_Pitch);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
+}
+
+void ABlasterCharacter::SimProxiesTurn()
+{
+	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) { return; }
+	
+	// Simulated proxies should not rotate the root bone. Only the locally controlled and server should rotate the root bone
+	bRotateRootBone = false;
+
+	float Speed = CalculateSpeed();
+	if (Speed > 0.0f)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+		return;
+	}
+
+	ProxyRotationLastFrame = ProxyRotation;
+	ProxyRotation = GetActorRotation();
+	ProxyYaw = UKismetMathLibrary::NormalizedDeltaRotator(ProxyRotation, ProxyRotationLastFrame).Yaw;
+
+	UE_LOG(LogTemp, Warning, TEXT("ProxyYaw: %f"), ProxyYaw);
+
+	if (FMath::Abs(ProxyYaw) > TurnThreshold)
+	{
+		// Turn right
+		if (ProxyYaw > TurnThreshold)
+		{
+			TurningInPlace = ETurningInPlace::ETIP_Right;
+		}
+		// Turn left
+		else if (ProxyYaw < -TurnThreshold)
+		{
+			TurningInPlace = ETurningInPlace::ETIP_Left;
+		}
+		else
+		{
+			TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+		}
+		return;
+	}
+	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 }
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
