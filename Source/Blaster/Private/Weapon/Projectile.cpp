@@ -6,6 +6,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundCue.h"
 #include "Character/BlasterCharacter.h"
+#include "Blaster/Blaster.h"
 
 
 AProjectile::AProjectile()
@@ -21,7 +22,7 @@ AProjectile::AProjectile()
 	this->CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	this->CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	this->CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
-	this->CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+	this->CollisionBox->SetCollisionResponseToChannel(ECC_SkeletalMesh , ECollisionResponse::ECR_Block);
 
 	this->ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	this->ProjectileMovementComponent->bRotationFollowsVelocity = true;
