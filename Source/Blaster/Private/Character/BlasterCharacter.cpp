@@ -114,6 +114,26 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
+void ABlasterCharacter::PlayHitReactMontage()
+{
+	if (this->Combat == nullptr || this->Combat->EquippedWeapon == nullptr) { return; }
+
+	UAnimInstance* AnimInstance = this->GetMesh()->GetAnimInstance();
+	if (AnimInstance && HitReactMontage)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("AnimInstance: %s"), *AnimInstance->GetName());
+		AnimInstance->Montage_Play(this->HitReactMontage);
+		// Play the appropriate section of the anim montage
+		FName SectionName("FromFront");
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
+void ABlasterCharacter::MulticastHit_Implementation()
+{
+	PlayHitReactMontage();
+}
+
 void ABlasterCharacter::AimOffset(float DeltaTime)
 {
 	if (this->Combat && this->Combat->EquippedWeapon == nullptr) { return; }
