@@ -78,9 +78,52 @@ private:
 	TSubclassOf<class ACasing> CasingClass;
 
 public:
+	/**
+	* Textures for the weapon crosshairs
+	*/
+
+	UPROPERTY(EditAnywhere, Category = "Crosshairs")
+	class UTexture2D* CrosshairsCenter;
+
+	UPROPERTY(EditAnywhere, Category = "Crosshairs")
+	UTexture2D* CrosshairsLeft;
+
+	UPROPERTY(EditAnywhere, Category = "Crosshairs")
+	UTexture2D* CrosshairsRight;
+
+	UPROPERTY(EditAnywhere, Category = "Crosshairs")
+	UTexture2D* CrosshairsTop;
+
+	UPROPERTY(EditAnywhere, Category = "Crosshairs")
+	UTexture2D* CrosshairsBottom;
+
+	/**
+	* Zoomed FOV while aiming
+	*/
+	UPROPERTY(EditAnywhere)
+	float ZoomedFOV = 30.0f;
+
+	UPROPERTY(EditAnywhere)
+	float ZoomInterpSpeed = 20.0f;
+
+	/**
+	* Automatic fire
+	*/
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float FireDelay = 0.15f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	bool bAutomatic = true;
+
+public:
 	void SetWeaponState(EWeaponState State);
 
 	USphereComponent* GetAreaSphere() const;
 
 	USkeletalMeshComponent* GetWeaponMesh();
+
+	FORCEINLINE float GetZoomedFOV() const { return ZoomedFOV; }
+
+	FORCEINLINE float GetZoomInterpSpeed() const { return ZoomInterpSpeed; }
 };

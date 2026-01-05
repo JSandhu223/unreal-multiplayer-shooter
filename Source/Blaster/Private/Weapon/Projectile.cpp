@@ -5,6 +5,8 @@
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundCue.h"
+#include "Character/BlasterCharacter.h"
+#include "Blaster/Blaster.h"
 
 
 AProjectile::AProjectile()
@@ -20,6 +22,7 @@ AProjectile::AProjectile()
 	this->CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	this->CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	this->CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+	this->CollisionBox->SetCollisionResponseToChannel(ECC_SkeletalMesh , ECollisionResponse::ECR_Block);
 
 	this->ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	this->ProjectileMovementComponent->bRotationFollowsVelocity = true;
@@ -49,6 +52,11 @@ void AProjectile::BeginPlay()
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor))
+	{
+		BlasterCharacter->MulticastHit();
+	}
+
 	// The destruction of this actor will get replicated down to the clients since we set 'bReplicates = true' in the constructor
 	this->Destroy();
 }

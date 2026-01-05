@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "HUD/BlasterHUD.h"
 #include "CombatComponent.generated.h"
 
 
@@ -31,6 +32,10 @@ protected:
 private:
 	class ABlasterCharacter* Character;
 
+	class ABlasterPlayerController* Controller;
+
+	class ABlasterHUD* HUD;
+
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
 
@@ -45,6 +50,8 @@ public:
 
 	void FireButtonPressed(bool bPressed);
 
+	void Fire();
+
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
 
@@ -52,6 +59,8 @@ public:
 	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
 
 	void TraceUnderCrosshairs(struct FHitResult& TraceHitResult);
+
+	void SetHUDCrosshairs(float DeltaTime);
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -61,4 +70,45 @@ private:
 	float AimWalkSpeed;
 
 	bool bFireButtonPressed;
+
+	/**
+	* HUD and crosshairs	
+	*/
+	float CrosshairVelocityFactor;
+	float CrosshairInAirFactor;
+	float CrosshairAimFactor;
+	float CrosshairShootingFactor;
+
+	FVector HitTarget;
+
+	FHUDPackage HUDPackage;
+
+	/*
+	* Aiming and FOV
+	*/
+	// Field of view when not aiming set to the target's base FOV in BeginPlay
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	float DefaultFOV;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float ZoomedFOV = 30.0f;
+
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	float CurrentFOV;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float ZoomInterpSpeed = 20.0f;
+
+	void InterpFOV(float DeltaTime);
+
+	/**
+	* Automatic fire
+	*/
+
+	FTimerHandle FireTimer;
+
+	bool bCanFire = true;
+
+	void StartFireTimer();
+	void FireTimerFinished();
 };

@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "BlasterTypes/TurningInPlace.h"
+#include "Interfaces/InteractWithCrosshairsInterface.h"
 #include "BlasterCharacter.generated.h"
 
 UCLASS()
-class BLASTER_API ABlasterCharacter : public ACharacter
+class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 
@@ -25,12 +26,23 @@ public:
 	
 	void PlayFireMontage(bool bAiming);
 
+	void PlayHitReactMontage();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHit();
+
+	virtual void OnRep_ReplicatedMovement() override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	// Called every frame
 	void AimOffset(float DeltaTime);
+
+	void CalculateAO_Pitch();
+
+	void SimProxiesTurn();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
@@ -62,6 +74,23 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	class UAnimMontage* FireWeaponMontage;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	UAnimMontage* HitReactMontage;
+
+	// Hides the character when the camera is close
+	void HideCharacter();
+
+	UPROPERTY(EditAnywhere)
+	float CameraThreshold = 200.0f;
+
+	bool bRotateRootBone;
+	float TurnThreshold = 0.5f;
+	FRotator ProxyRotationLastFrame;
+	FRotator ProxyRotation;
+	float ProxyYaw;
+	float TimeSinceLastMovementReplication;
+	float CalculateSpeed();
+
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
@@ -80,4 +109,10 @@ public:
 	AWeapon* GetEquippedWeapon();
 
 	ETurningInPlace GetTurningInPlace() const;
+
+	FVector GetHitTarget() const;
+
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
 };
